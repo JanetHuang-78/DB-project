@@ -1,0 +1,43 @@
+body {
+    background-color: #eee;
+    font-size: 15px;
+}
+
+.wrapper {
+    width: 500px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 10px;
+}
+
+header, footer {
+    background-color: ghostwhite;
+    padding: 20px;
+}
+
+main {
+    background-color: cornsilk;
+    padding: 20px;
+}
+
+ul{
+    background-color: cornsilk;
+    margin: 0;
+}
+
+li{
+background-color: lightgray;
+color: lightseagreen;
+padding: 10px;
+margin: 5px;
+width: 300px;
+height: 30px;
+list-style: none;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+
+.sidebar-layout{
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+}
