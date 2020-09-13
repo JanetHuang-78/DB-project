@@ -66,8 +66,6 @@ app.post('/register',(req,res)=>{
     })
     .then((response)=>res.json(response))
     .catch((err)=>res.status(400).json(err))
-
-    //res.redirect('register')
 })
 
 app.get('/searchData',(req,res)=>{
@@ -118,10 +116,12 @@ app.get('/updateData',(req,res)=>{
 app.post('/updateId',(req,res)=>{
     const {id, name, department,email} = req.body;
 
+    let nameCapital = name.charAt(0).toUpperCase() + name.slice(1);
+
     knex('member')
     .where('id', '=', id)
-    .update({
-    name: name,
+    .update({    
+    name: nameCapital,
     department: department,
     email:email
   })
@@ -151,9 +151,16 @@ app.get('/delete',(req,res)=>{
 
 app.post('/deleteData',(req,res)=>{
     const{column, searchText} = req.body
+    let search = ''
 
+    if (column =='id'){
+        search = searchText;
+    }else{
+        search = searchText.charAt(0).toUpperCase()+searchText.slice(1)
+    }
+    
     knex('member')
-    .where(column,'=',searchText)
+    .where(column,'=',search)
     .del()
     .returning('*')
     .then(data=>{res.json(data)})
