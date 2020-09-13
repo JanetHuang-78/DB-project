@@ -15,11 +15,11 @@ var knex = require('knex')({
     }
   });
 
-  knex.schema
-  .createTable('users', table => {
-    table.increments('id');
-    table.string('user_name');
-  })
+//   knex.schema
+//   .createTable('users', table => {
+//     table.increments('id');
+//     table.string('user_name');
+//   })
 
 //   knex.select('*').from ('recipes')
 //   .then(data=>{console.log(data)});
@@ -42,37 +42,11 @@ app.set('views','./views')
 app.set('view engine','ejs')
 
 
-var database = [
-    {
-        id : 1,
-        name:'John',
-        job : 'accounting',
-        email : 'john@gmail.com'
-     },
-    {   id : 2,
-        name:'Sally',
-        job : 'fashion',
-        email : 'sally@gmail.com'
-
-    }
-]
-
-app.get('/picture',(req,res)=>{
-    res.sendFile(__dirname+'/public/picture.html')
-})
 
 app.get('/',(req,res)=>{
     res.render('index',{layout:'./frontpage', title:'FrontPage'})
 })
 
-// app.post('/signin',(req,res)=>{
-//     for(let i=0; i<database.length; i++){
-//         if(req.body.name === database[i].name && req.body.email === database[i].email){
-//             res.send('success')
-//         }
-//         else{res.status(400).send('login fail.')}
-//     }
-// })
 
 app.get('/register',(req,res)=>{
     res.render('register',{layout:'./sidebar',title:'Insert New Member',
@@ -81,14 +55,14 @@ app.get('/register',(req,res)=>{
 
 app.post('/register',(req,res)=>{
 
-    const {id, name, desc} = req.body;
+    const {name, department,email} = req.body;
     
-    knex('recipes')
+    knex('member')
     .returning('*')
     .insert({
-        id:id,
-        name:name,
-        directions:desc
+        name:name.charAt(0).toUpperCase()+name.slice(1),
+        department:department,
+        email:email
     })
     .then((response)=>res.json(response))
     .catch((err)=>res.status(400).json(err))
@@ -113,11 +87,26 @@ app.post('/searchId',(req,res)=>{
     //     }    
     // }
     //if (!found){res.send('Login fail')}
+    let search = '';
+    if (column =='id'){
+        search = searchText;
+    }else{
+        search = searchText.charAt(0).toUpperCase()+searchText.slice(1);
+    }
     
-    knex('recipes')
-    .where(column, '=', searchText)
+    knex('member')
+    .where(column, '=', search )
     .returning('*')
-    .then(data=>{res.json(data)})
+    .then(data=>{
+        if (data == ''){
+            res.json('No record in DataBase')
+        }else{
+        res.json(data)
+        }
+    
+    }
+    )
+
        
 })
 
@@ -127,18 +116,50 @@ app.get('/updateData',(req,res)=>{
 })
 
 app.post('/updateId',(req,res)=>{
-    const {id, name, desc} = req.body;
+    const {id, name, department,email} = req.body;
 
-    knex('recipes')
+    knex('member')
     .where('id', '=', id)
     .update({
     name: name,
-    directions: desc
+    department: department,
+    email:email
   })
   .returning('*')
   .then((data)=>{res.json(data)})
 })
 
+app.get('/current',(req,res)=>{
+    res.render('current',{title:"All Member",layout:'./sidebar',
+    sidebar:'Click the button to show all the members.'})
+    
+    
+})
+
+app.post('/current',(req,res)=>{
+    knex.select('*').from ('member')
+    .orderBy('id')
+    //.then(data=>{console.log(data)})
+    .then((data)=>{res.json(data)})
+    
+})
+
+app.get('/delete',(req,res)=>{
+    res.render('deleteData',{title:"Delete Member",layout:'./sidebar',
+    sidebar:'this is the function to delete member'})
+})
+
+app.post('/deleteData',(req,res)=>{
+    const{column, searchText} = req.body
+
+    knex('member')
+    .where(column,'=',searchText)
+    .del()
+    .returning('*')
+    .then(data=>{res.json(data)})
+
+})
 
 
-app.listen(3000)
+
+app.listen(5000)
